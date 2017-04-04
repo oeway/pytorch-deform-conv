@@ -7,7 +7,7 @@ import numpy as np
 from torch_deform_conv.deform_conv import th_batch_map_offsets
 
 
-class ConvOffset2D(nn.Module):
+class ConvOffset2D(nn.Conv2d):
     """ConvOffset2D
 
     Convolutional layer responsible for learning the 2D offsets and output the
@@ -28,15 +28,14 @@ class ConvOffset2D(nn.Module):
         **kwargs:
             Pass to superclass. See Con2d layer in pytorch
         """
-        super(ConvOffset2D, self).__init__()
         self.filters = filters
-        self.conv = nn.Conv2d(self.filters, self.filters*2, 3, padding=1, bias=False, **kwargs)
-        self.conv.weight.data.copy_(self._init_weights(self.conv.weight, init_normal_stddev))
+        super(ConvOffset2D, self).__init__(self.filters, self.filters*2, 3, padding=1, bias=False, **kwargs)
+        self.weight.data.copy_(self._init_weights(self.weight, init_normal_stddev))
 
     def forward(self, x):
         """Return the deformed featured map"""
         x_shape = x.size()
-        offsets = self.conv(x)
+        offsets = super(ConvOffset2D, self).forward(x)
 
         # offsets: (b*c, h, w, 2)
         offsets = self._to_bc_h_w_2(offsets, x_shape)
