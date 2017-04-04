@@ -1,5 +1,6 @@
 # PyTorch implementation of Deformable Convolution
-> by Wei OUYANG
+> by Wei OUYANG @ Institut Pasteur
+
 > The original implementation in Keras/TensorFlow: https://github.com/felixlaumon/deform-conv
 
 ### TODO List
