@@ -150,5 +150,6 @@ def get_deform_cnn(trainable=True):
     else:
         for k, m in model._modules.items():
             if not isinstance(m, ConvOffset2D):
-                m.requires_grad = False
+                for param in m.parameters():
+                    param.requires_grad = False
         return model

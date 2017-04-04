@@ -1,12 +1,12 @@
-# PyTorch implementation of Deformable Convolution
+# [WIP] PyTorch implementation of Deformable Convolution
  * by Wei OUYANG @ Institut Pasteur
  * The original implementation in Keras/TensorFlow: https://github.com/felixlaumon/deform-conv
 
 ### TODO List
  - [x] implement offsets mapping in pytorch
- - [x] pass all tests
- - [x] deformable convolution layers
- - [x] scaled mnist demo (no fine-tuning yet)
+ - [x] all tests passed
+ - [ ] deformable convolution layers
+ - [ ] scaled mnist demo (no fine-tuning yet)
  - [ ] use MNIST dataset from pytorch (instead of Keras)
  - [ ] support fine-tuning the deformable convolution layers
 

@@ -10,7 +10,7 @@ from torch.autograd import Variable
 from torch_deform_conv.layers import ConvOffset2D
 from torch_deform_conv.cnn import get_cnn, get_deform_cnn
 from torch_deform_conv.mnist import get_gen
-
+from torch_deform_conv.utils import transfer_weights
 
 batch_size = 32
 n_train = 60000
@@ -100,18 +100,19 @@ torch.save(model, 'models/cnn.th')
 # Evaluate normal CNN
 
 print('Evaluate normal CNN')
-model = torch.load('models/cnn.th')
+model_cnn = torch.load('models/cnn.th')
 
-test(model, test_gen, validation_steps, epoch)
+test(model_cnn, test_gen, validation_steps, epoch)
 # 99.27%
-test(model, test_scaled_gen, validation_steps, epoch)
+test(model_cnn, test_scaled_gen, validation_steps, epoch)
 # 58.83%
 
 # ---
 # Deformable CNN
 
-model = get_deform_cnn()
+model = get_deform_cnn(trainable=False)
 model = model.cuda()
+transfer_weights(model_cnn, model)
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 # optim = SGD(1e-3, momentum=0.99, nesterov=True)
 for epoch in range(20):
