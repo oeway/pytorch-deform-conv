@@ -16,10 +16,10 @@ def test_th_map_coordinates():
     coords = (np.random.random((200, 2)) * 99)
 
     sp_mapped_vals = map_coordinates(input, coords.T, order=1)
-    tf_mapped_vals = th_map_coordinates(
+    th_mapped_vals = th_map_coordinates(
         Variable(torch.from_numpy(input)), Variable(torch.from_numpy(coords))
     )
-    assert np.allclose(sp_mapped_vals, tf_mapped_vals.data.numpy(), atol=1e-5)
+    assert np.allclose(sp_mapped_vals, th_mapped_vals.data.numpy(), atol=1e-5)
 
 
 def test_th_batch_map_coordinates():
@@ -28,10 +28,10 @@ def test_th_batch_map_coordinates():
     coords = (np.random.random((4, 200, 2)) * 99)
 
     sp_mapped_vals = sp_batch_map_coordinates(input, coords)
-    tf_mapped_vals = th_batch_map_coordinates(
+    th_mapped_vals = th_batch_map_coordinates(
         Variable(torch.from_numpy(input)), Variable(torch.from_numpy(coords))
     )
-    assert np.allclose(sp_mapped_vals, tf_mapped_vals.data.numpy(), atol=1e-5)
+    assert np.allclose(sp_mapped_vals, th_mapped_vals.data.numpy(), atol=1e-5)
 
 
 def test_th_batch_map_offsets():
@@ -40,10 +40,10 @@ def test_th_batch_map_offsets():
     offsets = (np.random.random((4, 100, 100, 2)) * 2)
 
     sp_mapped_vals = sp_batch_map_offsets(input, offsets)
-    tf_mapped_vals = th_batch_map_offsets(
+    th_mapped_vals = th_batch_map_offsets(
         Variable(torch.from_numpy(input)), Variable(torch.from_numpy(offsets))
     )
-    assert np.allclose(sp_mapped_vals, tf_mapped_vals.data.numpy(), atol=1e-5)
+    assert np.allclose(sp_mapped_vals, th_mapped_vals.data.numpy(), atol=1e-5)
 
 
 def test_th_batch_map_offsets_grad():
