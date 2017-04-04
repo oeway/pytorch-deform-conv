@@ -87,8 +87,7 @@ def test(model, generator, batch_num, epoch):
 model = get_cnn()
 model = model.cuda()
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
-# optim = SGD(1e-3, momentum=0.99, nesterov=True)
-for epoch in range(20):
+for epoch in range(10):
     test(model, test_gen, validation_steps, epoch)
     train(model, train_gen, steps_per_epoch, epoch)
 
@@ -114,10 +113,9 @@ model = get_deform_cnn(trainable=False)
 model = model.cuda()
 transfer_weights(model_cnn, model)
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
-# optim = SGD(1e-3, momentum=0.99, nesterov=True)
 for epoch in range(20):
-    test(model, test_gen, validation_steps, epoch)
-    train(model, train_gen, steps_per_epoch, epoch)
+    test(model, test_scaled_gen, validation_steps, epoch)
+    train(model, train_scaled_gen, steps_per_epoch, epoch)
 
 
 torch.save(model, 'models/deform_cnn.th')
