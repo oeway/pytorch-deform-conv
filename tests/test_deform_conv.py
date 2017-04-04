@@ -56,6 +56,7 @@ def test_th_batch_map_offsets_grad():
 
     th_mapped_vals = th_batch_map_offsets(input, offsets)
     # TODO: how to test the gradients?
-    i = torch.from_numpy(np.random.random((4, 100, 100)))
-    th_mapped_vals.backward(i)
-    assert th_mapped_vals.grad is None
+    e = torch.from_numpy(np.random.random((4, 100, 100)))
+    th_mapped_vals.backward(e)
+    grad = input.grad
+    assert not np.allclose(grad.data.numpy(), 0)
