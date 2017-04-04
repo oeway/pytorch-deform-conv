@@ -1,4 +1,6 @@
 import numpy as np
+import torch
+from torch.autograd import Variable
 from scipy.ndimage.interpolation import map_coordinates
 
 from torch_deform_conv.deform_conv import (
