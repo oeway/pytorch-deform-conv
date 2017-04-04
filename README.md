@@ -4,10 +4,10 @@
 
 ### TODO List
  - [x] implement offsets mapping in pytorch
- - [x] tests
+ - [x] pass all tests
  - [x] deformable convolution layers
  - [x] scaled mnist demo (no fine-tuning yet)
- - [ ] now MNIST dataset is from Keras, need to use pytorch version
+ - [ ] use MNIST dataset from pytorch (instead of Keras)
  - [ ] support fine-tuning the deformable convolution layers
 
 ## Understanding Deformable Convolution
