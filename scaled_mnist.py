@@ -99,6 +99,7 @@ torch.save(model, 'models/cnn.th')
 # ---
 # Evaluate normal CNN
 
+print('Evaluate normal CNN')
 model = torch.load('models/cnn.th')
 
 test(model, test_gen, validation_steps, epoch)
@@ -124,6 +125,7 @@ torch.save(model, 'models/deform_cnn.th')
 # ---
 # Evaluate deformable CNN
 
+print('Evaluate deformable CNN')
 model = torch.load('models/deform_cnn.th')
 
 test(model, test_gen, validation_steps, epoch)
