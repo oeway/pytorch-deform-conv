@@ -1,11 +1,10 @@
 import numpy as np
-import keras.backend as K
 from scipy.ndimage.interpolation import map_coordinates
 
-from deform_conv.deform_conv import (
-    tf_map_coordinates,
-    sp_batch_map_coordinates, tf_batch_map_coordinates,
-    sp_batch_map_offsets, tf_batch_map_offsets
+from torch_deform_conv.deform_conv import (
+    th_map_coordinates,
+    sp_batch_map_coordinates, th_batch_map_coordinates,
+    sp_batch_map_offsets, th_batch_map_offsets
 )
 
 
