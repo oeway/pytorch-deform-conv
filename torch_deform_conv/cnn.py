@@ -144,7 +144,11 @@ def get_cnn():
     return ConvNet()
 
 def get_deform_cnn(trainable=True):
+    model = DeformConvNet()
     if trainable:
-        return DeformConvNet()
+        return model
     else:
-        raise Exception('not implemented yet')
+        for k, m in model._modules.items():
+            if not isinstance(m, ConvOffset2D):
+                m.requires_grad = False
+        return model
