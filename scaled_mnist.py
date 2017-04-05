@@ -93,7 +93,6 @@ for epoch in range(10):
 
 
 torch.save(model, 'models/cnn.th')
-# 1875/1875 [==============================] - 24s - loss: 0.0090 - acc: 0.9969 - val_loss: 0.0528 - val_acc: 0.9858
 
 # ---
 # Evaluate normal CNN
@@ -109,6 +108,7 @@ test(model_cnn, test_scaled_gen, validation_steps, epoch)
 # ---
 # Deformable CNN
 
+print('Finetune deformable CNN (ConvOffset2D and BatchNorm)')
 model = get_deform_cnn(trainable=False)
 model = model.cuda()
 transfer_weights(model_cnn, model)
@@ -119,7 +119,6 @@ for epoch in range(20):
 
 
 torch.save(model, 'models/deform_cnn.th')
-# 1875/1875 [==============================] - 24s - loss: 0.0090 - acc: 0.9969 - val_loss: 0.0528 - val_acc: 0.9858
 
 # ---
 # Evaluate deformable CNN
@@ -128,19 +127,6 @@ print('Evaluate deformable CNN')
 model = torch.load('models/deform_cnn.th')
 
 test(model, test_gen, validation_steps, epoch)
-# 99.11%
+# xx%
 test(model, test_scaled_gen, validation_steps, epoch)
-# 63.27%
-
-# TODO: support fine-tuning
-# deform_conv_layers = [l for l in model.layers if isinstance(l, ConvOffset2D)]
-#
-# Xb, Yb = next(test_gen)
-# for l in deform_conv_layers:
-#     print(l)
-#     _model = Model(inputs=inputs, outputs=l.output)
-#     offsets = _model.predict(Xb)
-#     offsets = offsets.reshape(offsets.shape[0], offsets.shape[1], offsets.shape[2], -1, 2)
-#     print(offsets.min())
-#     print(offsets.mean())
-#     print(offsets.max())
+# xx%

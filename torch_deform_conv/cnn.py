@@ -93,11 +93,23 @@ class DeformConvNet(nn.Module):
         x = F.softmax(x)
         return x
 
-    def freeze(self, skip=ConvOffset2D):
+    def freeze(self, module_classes):
+        '''
+        freeze modules for finetuning
+        '''
         for k, m in self._modules.items():
-            if skip is None or not isinstance(m, skip):
+            if any([isinstance(m, mc) for mc in module_classes]):
                 for param in m.parameters():
                     param.requires_grad = False
+
+    def unfreeze(self, module_classes):
+        '''
+        unfreeze modules
+        '''
+        for k, m in self._modules.items():
+            if any([isinstance(m, mc) for mc in module_classes]):
+                for param in m.parameters():
+                    param.requires_grad = True
 
     def parameters(self):
         return filter(lambda p: p.requires_grad, super(DeformConvNet, self).parameters())
@@ -105,7 +117,8 @@ class DeformConvNet(nn.Module):
 def get_cnn():
     return ConvNet()
 
-def get_deform_cnn(trainable=True):
+def get_deform_cnn(trainable=True, freeze_filter=[nn.Conv2d, nn.Linear]):
     model = DeformConvNet()
-    model.freeze(skip=ConvOffset2D)
+    if not trainable:
+        model.freeze(freeze_filter)
     return model
