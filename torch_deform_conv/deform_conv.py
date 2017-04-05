@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division
 
 import torch
+import torch.nn.functional as F
 from torch.autograd import Variable
 
 import numpy as np
@@ -43,17 +44,18 @@ def th_map_coordinates(input, coords, order=1):
     """
 
     assert order == 1
-    if coords.requires_grad:
-        coords = coords.detach()
+    input_size = input.size(0)
+    coords = F.hardtanh(coords, min_val=0, max_val= input_size - 1)
+    
     coords_lt = coords.floor().long()
     coords_rb = coords.ceil().long()
     coords_lb = torch.stack([coords_lt[:, 0], coords_rb[:, 1]], 1)
     coords_rt = torch.stack([coords_rb[:, 0], coords_lt[:, 1]], 1)
 
-    vals_lt = th_gather_2d(input,  coords_lt)
-    vals_rb = th_gather_2d(input,  coords_rb)
-    vals_lb = th_gather_2d(input,  coords_lb)
-    vals_rt = th_gather_2d(input,  coords_rt)
+    vals_lt = th_gather_2d(input,  coords_lt.detach())
+    vals_rb = th_gather_2d(input,  coords_rb.detach())
+    vals_lb = th_gather_2d(input,  coords_lb.detach())
+    vals_rt = th_gather_2d(input,  coords_rt.detach())
 
     coords_offset_lt = coords - coords_lt.type(coords.data.type())
 
@@ -85,15 +87,11 @@ def th_batch_map_coordinates(input, coords, order=1):
     tf.Tensor. shape = (b, s, s)
     """
 
-    input_shape = input.size()
-    batch_size = input_shape[0]
-    input_size = input_shape[1]
-
+    batch_size = input.size(0)
+    input_size = input.size(1)
     n_coords = coords.size(1)
-    coords[torch.lt(coords,0)] = 0
-    coords[torch.gt(coords, input_size - 1)] = input_size - 1
-    if coords.requires_grad:
-        coords = coords.detach()
+
+    coords = F.hardtanh(coords, min_val=0, max_val= input_size - 1)
     coords_lt = coords.floor().long()
     coords_rb = coords.ceil().long()
     coords_lb = torch.stack([coords_lt[..., 0], coords_rb[..., 1]], 2)
@@ -111,17 +109,16 @@ def th_batch_map_coordinates(input, coords, order=1):
         vals = th_flatten(input).index_select(0, inds)
         vals = vals.view(batch_size, n_coords)
         return vals
-
-    vals_lt = _get_vals_by_coords(input, coords_lt)
-    vals_rb = _get_vals_by_coords(input, coords_rb)
-    vals_lb = _get_vals_by_coords(input, coords_lb)
-    vals_rt = _get_vals_by_coords(input, coords_rt)
+    
+    vals_lt = _get_vals_by_coords(input, coords_lt.detach())
+    vals_rb = _get_vals_by_coords(input, coords_rb.detach())
+    vals_lb = _get_vals_by_coords(input, coords_lb.detach())
+    vals_rt = _get_vals_by_coords(input, coords_rt.detach())
 
     coords_offset_lt = coords - coords_lt.type(coords.data.type())
-    vals_t = vals_lt + (vals_rt - vals_lt) * coords_offset_lt[..., 0]
-    vals_b = vals_lb + (vals_rb - vals_lb) * coords_offset_lt[..., 0]
-    mapped_vals = vals_t + (vals_b - vals_t) * coords_offset_lt[..., 1]
-
+    vals_t = coords_offset_lt[..., 0]*(vals_rt - vals_lt) + vals_lt
+    vals_b = coords_offset_lt[..., 0]*(vals_rb - vals_lb) + vals_lb
+    mapped_vals = coords_offset_lt[..., 1]* (vals_b - vals_t) + vals_t
     return mapped_vals
 
 
@@ -139,7 +136,6 @@ def sp_batch_map_offsets(input, offsets):
 
     mapped_vals = sp_batch_map_coordinates(input, coords)
     return mapped_vals
-
 
 
 def th_batch_map_offsets(input, offsets, order=1):
