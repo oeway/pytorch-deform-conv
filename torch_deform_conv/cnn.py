@@ -93,18 +93,19 @@ class DeformConvNet(nn.Module):
         x = F.softmax(x)
         return x
 
+    def freeze(self, skip=ConvOffset2D):
+        for k, m in self._modules.items():
+            if skip is None or not isinstance(m, skip):
+                for param in m.parameters():
+                    param.requires_grad = False
+
+    def parameters(self):
+        return filter(lambda p: p.requires_grad, super(DeformConvNet, self).parameters())
 
 def get_cnn():
     return ConvNet()
 
-
 def get_deform_cnn(trainable=True):
     model = DeformConvNet()
-    if trainable:
-        return model
-    else:
-        for k, m in model._modules.items():
-            if not isinstance(m, ConvOffset2D):
-                for param in m.parameters():
-                    param.requires_grad = False
-        return model
+    model.freeze(skip=ConvOffset2D)
+    return model
