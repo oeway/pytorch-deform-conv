@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 
 import numpy as np
-from torch_deform_conv.deform_conv import th_batch_map_offsets
+from torch_deform_conv.deform_conv import th_batch_map_offsets, th_generate_grid
 
 
 class ConvOffset2D(nn.Conv2d):
@@ -29,6 +29,7 @@ class ConvOffset2D(nn.Conv2d):
             Pass to superclass. See Con2d layer in pytorch
         """
         self.filters = filters
+        self._grid_param = None
         super(ConvOffset2D, self).__init__(self.filters, self.filters*2, 3, padding=1, bias=False, **kwargs)
         self.weight.data.copy_(self._init_weights(self.weight, init_normal_stddev))
 
@@ -44,13 +45,23 @@ class ConvOffset2D(nn.Conv2d):
         x = self._to_bc_h_w(x, x_shape)
 
         # X_offset: (b*c, h, w)
-        x_offset = th_batch_map_offsets(x, offsets)
+        x_offset = th_batch_map_offsets(x, offsets, grid=self._get_grid(self,x))
 
         # x_offset: (b, h, w, c)
         x_offset = self._to_b_c_h_w(x_offset, x_shape)
 
         return x_offset
 
+    @staticmethod
+    def _get_grid(self, x):
+        batch_size, input_size= x.size(0), x.size(1)
+        dtype, cuda = x.data.type(), x.data.is_cuda
+        if self._grid_param == (batch_size, input_size, dtype, cuda):
+            return self._grid
+        self._grid_param = (batch_size, input_size, dtype, cuda)
+        self._grid = th_generate_grid(batch_size, input_size, dtype, cuda)
+        return self._grid
+    
     @staticmethod
     def _init_weights(weights, std):
         fan_out = weights.size(0)

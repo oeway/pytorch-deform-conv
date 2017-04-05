@@ -52,10 +52,10 @@ def test_th_batch_map_offsets_grad():
     offsets = (np.random.random((4, 100, 100, 2)) * 2)
 
     input = Variable(torch.from_numpy(input), requires_grad=True)
-    offsets = Variable(torch.from_numpy(offsets), requires_grad=False)
+    offsets = Variable(torch.from_numpy(offsets), requires_grad=True)
 
     th_mapped_vals = th_batch_map_offsets(input, offsets)
     e = torch.from_numpy(np.random.random((4, 100, 100)))
     th_mapped_vals.backward(e)
-    grad = input.grad
-    assert not np.allclose(grad.data.numpy(), 0)
+    assert not np.allclose(input.grad.data.numpy(), 0)
+    assert not np.allclose(offsets.grad.data.numpy(), 0)

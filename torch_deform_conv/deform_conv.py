@@ -138,7 +138,21 @@ def sp_batch_map_offsets(input, offsets):
     return mapped_vals
 
 
-def th_batch_map_offsets(input, offsets, order=1):
+def th_generate_grid(batch_size, input_size, dtype, cuda):
+    grid = np.meshgrid(
+        range(input_size), range(input_size), indexing='ij'
+    )
+    grid = np.stack(grid, axis=-1)
+    grid = grid.reshape(-1, 2)
+
+    grid = np_repeat_2d(grid, batch_size)
+    grid = torch.from_numpy(grid).type(dtype)
+    if cuda:
+        grid = grid.cuda()
+    return Variable(grid, requires_grad=False)
+
+
+def th_batch_map_offsets(input, offsets, grid=None, order=1):
     """Batch map offsets into input
     Parameters
     ---------
@@ -148,23 +162,14 @@ def th_batch_map_offsets(input, offsets, order=1):
     -------
     torch.Tensor. shape = (b, s, s)
     """
-    input_shape = input.size()
-    batch_size = input_shape[0]
-    input_size = input_shape[1]
+    batch_size = input.size(0)
+    input_size = input.size(1)
 
     offsets = offsets.view(batch_size, -1, 2)
-    grid = np.meshgrid(
-        range(input_size), range(input_size), indexing='ij'
-    )
-    grid = np.stack(grid, axis=-1)
-    grid = grid.reshape(-1, 2)
+    if grid is None:
+        grid = th_generate_grid(batch_size, input_size, offsets.data.type(), offsets.data.is_cuda)
 
-    grid = np_repeat_2d(grid, batch_size)
-    grid = torch.from_numpy(grid).type(offsets.data.type())
-    if offsets.is_cuda:
-        grid = grid.cuda()
-
-    coords = offsets.add(Variable(grid, requires_grad=False))
+    coords = offsets + grid
 
     mapped_vals = th_batch_map_coordinates(input, coords)
     return mapped_vals
