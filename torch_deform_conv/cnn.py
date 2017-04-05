@@ -98,7 +98,7 @@ class DeformConvNet(nn.Module):
         freeze modules for finetuning
         '''
         for k, m in self._modules.items():
-            if any([isinstance(m, mc) for mc in module_classes]):
+            if any([type(m) == mc for mc in module_classes]):
                 for param in m.parameters():
                     param.requires_grad = False
 
