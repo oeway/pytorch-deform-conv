@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division
 
 import torch
-import torch.nn.functional as F
 from torch.autograd import Variable
 
 import numpy as np
@@ -45,8 +44,8 @@ def th_map_coordinates(input, coords, order=1):
 
     assert order == 1
     input_size = input.size(0)
-    coords = F.hardtanh(coords, min_val=0, max_val= input_size - 1)
-    
+
+    coords = torch.clamp(coords, 0, input_size - 1)
     coords_lt = coords.floor().long()
     coords_rb = coords.ceil().long()
     coords_lb = torch.stack([coords_lt[:, 0], coords_rb[:, 1]], 1)
@@ -91,7 +90,7 @@ def th_batch_map_coordinates(input, coords, order=1):
     input_size = input.size(1)
     n_coords = coords.size(1)
 
-    coords = F.hardtanh(coords, min_val=0, max_val= input_size - 1)
+    coords = torch.clamp(coords, 0, input_size - 1)
     coords_lt = coords.floor().long()
     coords_rb = coords.ceil().long()
     coords_lb = torch.stack([coords_lt[..., 0], coords_rb[..., 1]], 2)
