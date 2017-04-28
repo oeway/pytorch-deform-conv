@@ -24,8 +24,8 @@ def test_th_map_coordinates():
 
 def test_th_batch_map_coordinates():
     np.random.seed(42)
-    input = np.random.random((4, 100, 100))
-    coords = (np.random.random((4, 200, 2)) * 99)
+    input = np.random.random((4, 100, 156))
+    coords = np.random.random((4, 100*156, 2)) * 99
 
     sp_mapped_vals = sp_batch_map_coordinates(input, coords)
     th_mapped_vals = th_batch_map_coordinates(
@@ -36,8 +36,8 @@ def test_th_batch_map_coordinates():
 
 def test_th_batch_map_offsets():
     np.random.seed(42)
-    input = np.random.random((4, 100, 100))
-    offsets = (np.random.random((4, 100, 100, 2)) * 2)
+    input = np.random.random((4, 100, 156))
+    offsets = (np.random.random((4, 100, 156, 2)) * 2)
 
     sp_mapped_vals = sp_batch_map_offsets(input, offsets)
     th_mapped_vals = th_batch_map_offsets(
@@ -48,14 +48,19 @@ def test_th_batch_map_offsets():
 
 def test_th_batch_map_offsets_grad():
     np.random.seed(42)
-    input = np.random.random((4, 100, 100))
-    offsets = (np.random.random((4, 100, 100, 2)) * 2)
+    input = np.random.random((4, 100, 156))
+    offsets = (np.random.random((4, 100, 156, 2)) * 2)
 
     input = Variable(torch.from_numpy(input), requires_grad=True)
     offsets = Variable(torch.from_numpy(offsets), requires_grad=True)
 
     th_mapped_vals = th_batch_map_offsets(input, offsets)
-    e = torch.from_numpy(np.random.random((4, 100, 100)))
+    e = torch.from_numpy(np.random.random((4, 100, 156)))
     th_mapped_vals.backward(e)
     assert not np.allclose(input.grad.data.numpy(), 0)
     assert not np.allclose(offsets.grad.data.numpy(), 0)
+
+if __name__ == '__main__':
+    test_th_batch_map_coordinates()
+    test_th_batch_map_offsets()
+    test_th_batch_map_offsets_grad()
