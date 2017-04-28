@@ -54,12 +54,12 @@ class ConvOffset2D(nn.Conv2d):
 
     @staticmethod
     def _get_grid(self, x):
-        batch_size, input_size= x.size(0), x.size(1)
+        batch_size, input_height, input_weight = x.size(0), x.size(1), x.size(2)
         dtype, cuda = x.data.type(), x.data.is_cuda
-        if self._grid_param == (batch_size, input_size, dtype, cuda):
+        if self._grid_param == (batch_size, input_height, input_weight, dtype, cuda):
             return self._grid
-        self._grid_param = (batch_size, input_size, dtype, cuda)
-        self._grid = th_generate_grid(batch_size, input_size, dtype, cuda)
+        self._grid_param = (batch_size, input_height, input_weight, dtype, cuda)
+        self._grid = th_generate_grid(batch_size, input_height, input_weight, dtype, cuda)
         return self._grid
     
     @staticmethod
