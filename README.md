@@ -1,4 +1,9 @@
 # PyTorch implementation of Deformable Convolution
+
+ **!!!Warning: There is some issues in this implementation, please consider using for example: [TORCHVISION.OPS.DEFORM_CONV](https://pytorch.org/vision/stable/_modules/torchvision/ops/deform_conv.html)**
+ 
+
+
  * By Wei OUYANG @ Institut Pasteur
  * Thanks to Felix Lau's Keras/TensorFlow implementation: ~~https://github.com/felixlaumon/deform-conv~~ (https://github.com/kastnerkyle/deform-conv)
 
